@@ -1,0 +1,218 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>ЛНАУ</title>
+<link rel="stylesheet" href="/css/styles_new.css">
+<link rel="stylesheet" href="/lnau/lnau_styles.css">
+<script src="/lnau/js/lnau.js"></script>
+<script src="/lnau/js/lnau_lib.js"></script>
+<script src="/lnau/js/database_constructor.js"></script>
+<script src="/lnau/js/funcs.js"></script>
+
+<style>
+    td {
+		min-width:20px;
+		border:inset 1px;
+	}
+	select, .ref_list {
+		font-family:Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+		font-size:12px;
+	}
+	.ref_list {
+		width:10px;
+		background:none;
+	}
+	.ref_list:hover {
+		border:inset 1px white;
+		border-radius:50%;
+	}
+	input[type="text"] {
+		margin:0 10px;
+		font-size:12px;
+	}
+	button {
+		margin:0 10px;
+	}
+</style>
+<script>
+	// ========================================= DB =========================================================
+	
+	lnau.disciplinesList = new LNAU_DataBase ('disciplinesList');
+	lnau.disciplinesList.createWorkerInstance(lnau.disciplinesList.callback);
+	
+	lnau.teachers   = new LNAU_DataBase ('teachers');
+	lnau.teachers.createWorkerInstance(lnau.teachers.callback);
+	
+	lnau.specialities = new LNAU_DataBase ('specialities');
+	lnau.specialities.createWorkerInstance(lnau.specialities.callback);
+	lnau.directions   = new LNAU_DataBase ('directions');
+	lnau.directions.createWorkerInstance(lnau.directions.callback);
+	lnau.groups       = new LNAU_DataBase ('groups');
+	lnau.groups.createWorkerInstance(lnau.groups.callback);
+	lnau.auditories   = new LNAU_DataBase ('auditories');
+	lnau.auditories.createWorkerInstance(lnau.auditories.callback);
+	
+	// ======================================================================================================== callbacks
+	
+	
+	
+	function disciplinesList_callback ($response) {
+		//  справочник дисциплин
+		if (!lnau.disciplinesList.test_response( $response ) ) { return; }
+		
+		if ($response.header.responseType == 0) {
+			lnau.header.indicators[5].innerHTML = '&#9632;';
+			lnau.header.indicators[5].style.color = 'green';
+			// Создаем базу учебной нагрузки только после загрузки справочника дисциплин
+			lnau.disciplines  = new LNAU_DataBase ('disciplines');
+			lnau.disciplines.sourceURL = [];
+			lnau.disciplines.phpURL = [];
+			for (var i=0; i<7; i++) {
+				lnau.disciplines.sourceURL[i] = '/lnau/json/disciplines_0' + (i+1) + '.json';
+				lnau.disciplines.phpURL[i] = '/lnau/php/save_disciplines_0' + (i+1) + '.php';;
+			}
+			lnau.disciplines.createWorkerInstance(lnau.disciplines.callback);
+			lnau.summary   = new LNAU_DataBase ('summary');
+			lnau.summary.createWorkerInstance(lnau.summary.callback);
+		}
+	}
+	function groups_callback ($response) {
+		//  info по группам
+		if (!lnau.groups.test_response( $response ) ) { return; }
+		if ($response.header.responseType == 0) {
+			lnau.header.indicators[2].innerHTML = '&#9632;';
+			lnau.header.indicators[2].style.color = 'green';
+		}
+	}
+	// ----------------------------------------------------------------------------------- info по преподавателям
+	function teachers_callback ($response) {
+		if (!lnau.teachers.test_response( $response )) { return; }
+		if ($response.header.responseType == 0) {
+			lnau.header.indicators[6].innerHTML = '&#9632;';
+			lnau.header.indicators[6].style.color = 'green';
+		}
+	}
+	// ----------------------------------------------------------------------------------- info по специальностям
+	function specialities_callback ($response) {
+		if (!lnau.specialities.test_response( $response )) { return; }
+		if ($response.header.responseType == 0) {
+			lnau.header.indicators[1].innerHTML = '&#9632;';
+			lnau.header.indicators[1].style.color = 'green';
+		}
+	}
+	// ----------------------------------------------------------------------------------- info по направлениям
+	function directions_callback ($response) {
+		if (!lnau.directions.test_response( $response )) { return; }
+		if ($response.header.responseType == 0) {
+			lnau.header.indicators[0].innerHTML = '&#9632;';
+			lnau.header.indicators[0].style.color = 'green';
+		}
+	}
+	// ----------------------------------------------------------------------------------- info по дисциплинам
+	function disciplines_callback ($response) {
+		if (!lnau.disciplines.test_response( $response )) { return; }
+		if ($response.header.responseType == 0) {
+			lnau.header.indicators[3].innerHTML = '&#9632;';
+			lnau.header.indicators[3].style.color = 'green';
+		}
+	}
+	function auditories_callback ($response) {
+		if (!lnau.auditories.test_response( $response )) { return; }
+		if ($response.header.responseType == 0) {
+			lnau.header.indicators[4].innerHTML = '&#9632;';
+			lnau.header.indicators[4].style.color = 'green';
+		}
+	}
+	function summary_callback ($response) {
+		if (!lnau.summary.test_response( $response )) { return; }
+		if ($response.header.responseType == 0) {
+			lnau.header.indicators[7].innerHTML = '&#9632;';
+			lnau.header.indicators[7].style.color = 'green';
+		}
+	}
+	// ----------------------------------------------------------------------------------- 
+	
+</script>
+</head>
+
+<body>
+    <!--<button onClick="lnau_lib.saveFile (lnau.workers.discipline);">Save disciplines</button>-->
+    <!--<div id="lnau_header">
+        <span class="magenta">Виберіть розділ: &nbsp;&nbsp;
+            <select id = "lnau_sections" onChange="if (this.value) { eval(lnau.section.start_func[this.value])(); }">
+                <option value=null>...</option>
+                <option value="direction">Напрями</option>
+                <option value="speciality">Спеціальності</option>
+                <option value="group">Групи</option>
+                <option value="discipline">Навчальне навантаження</option>
+                <option value="auditory">Аудиторії</option>
+                <option value="disciplinesList">Довідник дисциплін</option>
+                <option value="teachers">Викладачі</option>
+                <option value="summary">Зведена таблиця</option>
+            </select>
+        </span>-->
+        <!-- =========================================  ================================================= -->
+        <!--<span id = "lnau_section_menu" class="magenta" style = "display:none">
+            <span class="magenta">Дії: &nbsp;&nbsp;
+            <select onChange="if (this.value) { eval(lnau.section.methods[this.value])(); } this.value=null;">
+               <option value=null>...</option>
+               
+               <option id="lnau_sel" value="selectData">Вибрати</option>
+               <option id="lnau_full_list" type="button" value="fullList">Повний перелік</option>
+               <option id="lnau_edit" value="edit">Редагувати</option>
+               <option id="lnau_del" value="remove">Видалити</option>
+               <option id="lnau_add" value="append">Додати</option>
+               <option id="lnau_save" value="save">Зберегти</option>
+               <option id="lnau_summary" value="summary">Створити зведену таблицю</option>
+               <!--<option value="indexing">Индексировать базу данных</option>-->
+            <!--</select>
+            
+        </span>
+        <button id="lnau_summary_table" onclick="lnau.section.methods['summary_table']();" title="Зведена таблиця в широкому варіанті">
+             <img src="/buttons/configure.png" style="width:25px;height:25px;">
+        </button>
+        <input type="checkbox" name="lnau_tableForm" id="lnau_tableForm" />У табличній формі
+        <button id="lnau_showDisciplines" type="button" onClick='lnau.funcs.request_for_dicsiplines_of_group()' style="display:none">Показати дисципліни</button>
+        <button id="lnau_auditories" onclick="lnau.funcs.auditories_table();" title="Таблиця аудиторій в широкому варіанті">
+            <img src="/buttons/scheme.png" style="width:25px;height:25px;">
+        </button>-->
+        <script>
+		    // --------------------- actions (options of select element) ----------------
+			lnau.section_menu = {
+				edit:                document.getElementById("lnau_edit"),
+				sel:                 document.getElementById("lnau_sel"),
+				list:                document.getElementById("lnau_full_list"),
+				del:                 document.getElementById("lnau_del"),
+				add:                 document.getElementById("lnau_add"),
+				save:                document.getElementById("lnau_save"),
+				summary:             document.getElementById("lnau_summary"),
+				summary_wide_table:  document.getElementById("lnau_summary_table"),
+				group_disciplines:   document.getElementById("lnau_showDisciplines"),
+				auditory_wide_table: document.getElementById("lnau_auditories"),
+			}
+		</script>
+        <!--<span id = "lnau_disciplinesList" style="display:none">&nbsp;&nbsp;&nbsp;Справочник
+            <button id = "lnau_buildDisciplinesList" />Створити</button>
+            <button id = "lnau_saveDisciplinesList" style="display:none">Зберегти</button>
+            <script>
+			    document.getElementById("lnau_buildDisciplinesList").onclick = function (event) {
+					lnau.funcs.request_for_dicsiplines_list();
+					document.getElementById("lnau_saveDisciplinesList").style.display="inline-block";
+				}
+				document.getElementById("lnau_saveDisciplinesList").onclick = function (event) {
+					lnau.disciplinesList.sendRequestToSaveData(lnau.disciplinesList.data);
+					lnau.funcs.set_dicsiplines_codes();
+				}
+			</script>
+        </span>
+    </div><!-- lnau_header -->
+    
+    <main id='main_content' style="margin-bottom:100px;"></main>
+    <div id="lnau_notice"></div>
+    <script>
+	    lnau_lib.create_controls ();
+		
+	</script>
+</body>
+</html>
