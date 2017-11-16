@@ -1,13 +1,13 @@
 //                                 C O N S T R U C T O R
 // -----------------------------------------------------------------------------------------------------
 function LNAU_DataBase (dataBaseId) {
-		this.sourceURL = 'json/' + dataBaseId + '.json';
-		this.phpURL = 'php/save_' + dataBaseId + '.php';
-		this.common_data = {};
-		this.data = {};
-		this.tmp = {};
-		this.id = dataBaseId;
-		this.callback = dataBaseId + '_callback';
+		this.sourceURL = '../json/' + dataBaseId + '.json'
+		this.phpURL = '../php/save_' + dataBaseId + '.php'
+		this.common_data = {}
+		this.data = {}
+		this.tmp = {}
+		this.id = dataBaseId
+		this.callback = dataBaseId + '_callback'
 		
 		// ------------------------------------------------------------------------------ test_response
 		this.test_response = function ($response) {
@@ -20,100 +20,105 @@ function LNAU_DataBase (dataBaseId) {
 					'Помилка доступу до даних: '
 			    ];
 				var err = $response.header.responseType;
-				var err_num = (err == 0)?0:((err == 10)?1:((err == 1)?2:3));
-				alert(err_msg[err_num] + $response.error_message);
-				return false;
+				var err_num = (err == 0)?0:((err == 10)?1:((err == 1)?2:3))
+				alert(err_msg[err_num] + $response.error_message)
+				return false
 			}
 			
 			if ( lnau.crossDatabaseProcessor.requestTo[this.id].status ) {
-				lnau.crossDatabaseProcessor.answerIsReady(this.id, $response.result);
-				return;
+				lnau.crossDatabaseProcessor.answerIsReady(this.id, $response.result)
+				return
 			}
 			switch ($response.header.responseType) {
 				case 0:
-				    this.worker.ready = true;
+				    this.worker.ready = true
 					if ($response.result) {
-						this.common_data = $response.result;
+						this.common_data = $response.result
 						for (var j = 0; j < this.common_data.fields.ids.length; j++) {
-							this.testFieldReference (this.common_data.fields.ids[j]);
+							this.testFieldReference (this.common_data.fields.ids[j])
 						}
 					}
-					return true;
-					break;
+					return true
+					break
 				case 2:
-				    // this.data = $response.result;
-				    // this.showAllData();
-					alert('Запис змінений. Не забудьте зберегти зміни завершенням роботи');
-					return true;
-					break;
+				    // this.data = $response.result
+				    // this.showAllData()
+					alert('Запис змінений. Не забудьте зберегти зміни завершенням роботи')
+					return true
+					break
 				case 3:
 				    alert('Записи змінені. Не забудьте зберегти зміни завершенням роботи');
-					return true;
-					break;
+					return true
+					break
 				case 4:
-					this.data = [$response.result];
-					document.getElementById('main_content').innerHTML = '';
-					this.showFullRecord (0);
-					return true;
-					break;
+					this.data = [$response.result]
+					document.getElementById('main_content').innerHTML = ''
+					this.showFullRecord (0)
+					return true
+					break
 				case 5:
-					this.data = $response.result;
-					this.showAllData();
-					return true;
-					break;
+					this.data = $response.result
+					this.showAllData()
+					return true
+					break
 				case 8:
-				    this.data = $response.result;
-				    return true;
-					break;
+				    this.data = $response.result
+				    return true
+					break
 				case 10:
-				    alert('Дані успішно збережені');
-					return true;
-					break;
+				    alert('Дані успішно збережені')
+					return true
+					break
 				case 1000:
-				    this.data = $response.result;
-				    this.showAllData();
-					return true;
-					break;
+				    this.data = $response.result
+				    this.showAllData()
+					return true
+					break
 				case 1001:
-				    this.data = $response.result;
-				    this.showAllData();
-					return true;
-					break;
+				    this.data = $response.result
+				    this.showAllData()
+					return true
+					break
 				case 1010:
 				    // records by keys
-					this.data = $response.result;
-					this.showAllData();
-					return true;
-					break;
+					this.data = $response.result
+					this.showAllData()
+					return true
+					break
 				case 1100:
 				    // Record by num
-					this.data = (Array.isArray(this.data))?(this.data):([this.data]);
-					this.data = this.data.concat([$response.result]);
-					this.showFullRecord (this.data.length-1);
-					return true;
-					break;
+					this.data = (Array.isArray(this.data))?(this.data):([this.data])
+					this.data = this.data.concat([$response.result])
+					this.showFullRecord (this.data.length-1)
+					return true
+					break
 				default:
-					alert('Warning: unknown worker answer type: ' + $response.header.responseType);
-					return false;
-					break;
+					alert('Warning: unknown worker answer type: ' + $response.header.responseType)
+					return false
+					break
 			}
 		};
 		// -------------------------------------------------------------------------------- createWorkerInstance
 		this.createWorkerInstance = function (callback) {
 			try {
-				this.worker = new Worker('js/json_loader_multydata.js');
-				this.worker.id = dataBaseId;
+				this.worker = new Worker('js/json_loader_multydata.js')
+				this.worker.id = dataBaseId
 				this.worker.addEventListener('message', function(e) {
 					if (!e.data.status) {
-						if (e.data.error_message == 'no URL') { alert('Помилка: не отриманий URL'); }
-						else { alert(e.data.error_message); }
+						if (e.data.error_message == 'no URL') 
+							alert('Помилка: не отриманий URL')
+						else alert ( e.data.error_message )
 					}
-					else { window[callback](e.data); }
-				});
-				this.worker.postMessage( { request_type:0, src_url:this.sourceURL, php_url:this.phpURL } );
+					else window [ callback ] (e.data)
+				})
+				this.worker.postMessage( {
+					request_type:0,
+					src_url:this.sourceURL,
+					php_url:this.phpURL
+				} )
 			}
 			catch (err) {
-				alert("Будь ласка, відновите браузер. На жаль, у Вашому браузері повна функціональність неможлива");
+				alert("Будь ласка, відновите браузер. На жаль, у Вашому браузері повна функціональність неможлива")
 			}
 		};
 		// ----------------------------------------------------------------------------------------------- closeWorker
@@ -124,147 +129,187 @@ function LNAU_DataBase (dataBaseId) {
 		
 		// ----------------------------------------------------------------------------------------------- sendRequest
 		this.sendRequestForAllData = function () {
-			document.getElementById('main_content').innerHTML = '';
-			var notice = document.createElement('div');
-			notice.id = "lnau_notice";
-			notice.style.position = 'fixed';
-			notice.style.bottom = '0';
-			notice.style.right = '0';
-			notice.style.width = 'auto';
-			notice.style.height = 'auto';
-			notice.style.padding = '2px 10px';
-			notice.style.backgroundColor = 'black';
-			document.getElementById('main_content').appendChild(notice);
+			document.getElementById('main_content').innerHTML = ''
+			var notice = document.createElement('div')
+			notice.id = "lnau_notice"
+			notice.style.position = 'fixed'
+			notice.style.bottom = '0'
+			notice.style.right = '0'
+			notice.style.width = 'auto'
+			notice.style.height = 'auto'
+			notice.style.padding = '2px 10px'
+			notice.style.backgroundColor = 'black'
+			document.getElementById('main_content').appendChild(notice)
 			
-			notice.innerHTML = '<h3>Почекайте, будь ласка...</h3>';
-			this.worker.postMessage( { request_type:1 } );
+			notice.innerHTML = '<h3>Почекайте, будь ласка...</h3>'
+			this.worker.postMessage( { request_type:1 } )
 		};
 		this.sendRequestToDeleteAllData = function () {
-			this.worker.postMessage( { request_type:8 } );
+			this.worker.postMessage( { request_type:8 } )
 		}
 		// ------------------------------------------------------------------------------------ sendRequestForRecodByNum
 		this.sendRequestForRecodByNum = function (recordNum) {
-			if (!Number.isInteger(recordNum)) { alert('Не відмічено жодного запису'); return; }
-			this.worker.postMessage( { request_type:1, params: { recordNum:recordNum } } );
+			if (!Number.isInteger(recordNum)) { alert('Не відмічено жодного запису'); return }
+			this.worker.postMessage( { request_type:1, params: { recordNum:recordNum } } )
 		};
 		this.sendRequestToDeleteRecodByNum = function (recordNum) {
-			this.worker.postMessage( { request_type:5, params: { recordNum:recordNum } } );
+			this.worker.postMessage( { request_type:5, params: { recordNum:recordNum } } )
 		};
 		this.sendRequestToAppendNewRecord = function ($record) {
-			this.worker.postMessage( { request_type:4, params: { record:$record } } );
+			this.worker.postMessage( { request_type:4, params: { record:$record } } )
 		};
 		this.sendRequestToSaveData = function () {
-			//this.sendRequestToUpdateData ();
-			this.worker.postMessage( { request_type:10, params:{ data:this.data } } );
+			//this.sendRequestToUpdateData ()
+			this.worker.postMessage( { request_type:10, params:{ data:this.data } } )
 		}
 		this.sendRequestForFields = function (fields) {
-			if (!fields) { alert('Не вказано поле запису'); return; }
-			this.worker.postMessage( { request_type:1, params: { fields:fields } } );
+			if ( !fields ) {
+				alert('Не вказано поле запису')
+				return
+			}
+			this.worker.postMessage( {
+				request_type:1,
+				params: { fields:fields }
+			} )
 		};
 		// ---------------------------------------------------------------------------------- sendRequestForRecodsByKeys
 		this.sendRequestForRecodsByKeys = function () {
 			
-			if (!this.common_data.selection) { return false; }
+			if ( !this.common_data.selection ) return false
 			
-			var keyFields = [];
-			var labels = [];
-			this.common_data.selection.keyValues = [];
+			var keyFields = []
+			var labels = []
+			this.common_data.selection.keyValues = []
 			
-			selectionWindow = lnau_lib.constructPopupWindow('Параметри вибору записів');
+			selectionWindow = lnau_lib.constructPopupWindow( 'Параметри вибору записів' )
 			for (var j = 0; j < this.common_data.selection.keyFields.length; j++) {
 				
-				keyFields[j] = this.common_data.selection.keyFields[j];
-				labels[j] = this.getFieldName(keyFields[j]);
-				this.common_data.selection.keyValues[j] = null;
-				var selectionPoint = this.getInputField (1, j, keyFields[j]);
-				selectionWindow.content.appendChild(selectionPoint);
+				keyFields[j] = this.common_data.selection.keyFields[j]
+				labels[j] = this.getFieldName(keyFields[j])
+				this.common_data.selection.keyValues[j] = null
+				var selectionPoint = this.getInputField (1, j, keyFields[j])
+				selectionWindow.content.appendChild(selectionPoint)
 			}
-			var btn = document.createElement('button');
-			btn.innerHTML = 'OK';
-			btn.workerObj = this.worker;
+			var btn = document.createElement('button')
+			btn.innerHTML = 'OK'
+			btn.workerObj = this.worker
 			btn.params = {
 				targetId: this.id,
 				keyFields:keyFields,
 				keyValues:this.common_data.selection.keyValues,
 				_labels:labels,
 				func:this.isEmptyValue
-			};
-			btn.ret = { fields: [], values: [] };
+			}
+			btn.ret = { fields: [], values: [] }
 			btn.onclick = function (event) {
-				var but = event.target;
-				selectionWindow.parentNode.removeChild(selectionWindow);
-				var k = 0;
-				var html = '<h3>' + lnau[but.params.targetId].common_data.name + '</h3>';
+				var but = event.target
+				selectionWindow.parentNode.removeChild(selectionWindow)
+				var k = 0
+				var html = '<h3>' + lnau[but.params.targetId].common_data.name + '</h3>'
 				
 				for ( var j = 0; j < but.params.keyFields.length; j++ ) {
 					
 					if (!but.params.func(but.params.keyValues[j])) {
-						but.ret.fields[k] = but.params.keyFields[j];
-						but.ret.values[k] = but.params.keyValues[j];
-						html += but.params._labels[j] + '&nbsp;' + but.params.keyValues[j];
-						k++;
+						but.ret.fields[k] = but.params.keyFields[j]
+						but.ret.values[k] = but.params.keyValues[j]
+						html += but.params._labels[j] + '&nbsp;' + but.params.keyValues[j]
+						k++
 					}
 				}
-				document.getElementById("lnau_notice").innerHTML = html;
-				if (but.ret.fields.length == 0) { alert('Ви не визначили параметри відбору записів'); return false; }
-				but.workerObj.postMessage({request_type:1, params:{ keyFields:but.ret.fields, keyValues:but.ret.values} });
-			};
-			selectionWindow.appendChild(btn);
-			document.body.appendChild(selectionWindow);
+				document.getElementById("lnau_notice").innerHTML = html
+				if (but.ret.fields.length == 0) {
+					alert('Ви не визначили параметри відбору записів')
+					return false
+				}
+				but.workerObj.postMessage ({
+					request_type:1,
+					params: {
+						keyFields:but.ret.fields,
+						keyValues:but.ret.values
+					}
+				})
+			}
+			selectionWindow.appendChild ( btn )
+			document.body.appendChild ( selectionWindow )
 		};
 		// ----------------------------------------------------------------------------- sendRequestToUpdateRecodByNum
 		this.sendRequestToUpdateRecodByNum = function (_recordNum, _data) {
 			// replace record by recordNum
-			if (!_data) { alert('Немає даних для заміни'); return; }
-			var recordNum = _recordNum || _data.record_num;
-			if (!recordNum) { alert('Не вказаний номер запису'); return; }
+			if ( !_data ) {
+				alert('Немає даних для заміни')
+				return
+			}
+			var recordNum = _recordNum || _data.record_num
+			if (!recordNum) {
+				alert('Не вказаний номер запису')
+				return
+			}
 			
-			this.worker.postMessage( { request_type:2, params: { recordNum:recordNum, record:_data } } );
-		};
+			this.worker.postMessage ( {
+				request_type:2,
+				params: {
+					recordNum:recordNum,
+					record:_data
+				}
+			} )
+		}
 		// ----------------------------------------------------------------------------------- sendRequestToUpdateData
 		this.sendRequestToUpdateData = function () {
 			// replace record by recordNum
-			if (!this.data) { alert('Немає даних для заміни'); return; }
-			this.worker.postMessage( { request_type:3, params: { data:this.data } } );
-		};
+			if ( !this.data ) {
+				alert('Немає даних для заміни')
+				return
+			}
+			this.worker.postMessage( {
+				request_type:3,
+				params: { data:this.data }
+			} )
+		}
 		// ----------------------------------------------------------------------------- sendRequestToDeleteRecodByNum
-		this.sendRequestToDeleteRecodByNum = function (recordNum) {
-			this.worker.postMessage( { request_type:5, params: { recordNum:recordNum } } );
-		};
+		this.sendRequestToDeleteRecodByNum = function ( recordNum ) {
+			this.worker.postMessage( {
+				request_type:5,
+				params: { recordNum:recordNum }
+			} )
+		}
 		// --------------------------------------------------------------------------------------------- Редактирование
-		this.isEmptyValue = function (_value) {
-			if (Number.isInteger(_value)) { return false; }
-			if (!_value) { return true; }
-			if (typeof _value === 'string' && _value.length == 0) { return true; }
-		};
+		this.isEmptyValue = function ( _value ) {
+			if ( Number.isInteger( _value ) ) return false
+			if ( !_value ) return true
+			if ( typeof _value === 'string' && _value.length == 0 ) return true
+		}
 		// ------------------------------------------------------------------------------------------- testFieldType
-		this.testFieldType = function ($field) {
-			var typ = typeof $field;
-			if (typ == 'object') { typ = Array.isArray($field)?'array':typ; }
-			return typ;
-		};
+		this.testFieldType = function ( $field ) {
+			var typ = typeof $field
+			if ( typ == 'object' ) typ = Array.isArray( $field ) ? 'array' : typ
+			return typ
+		}
 		// ------------------------------------------------------------------------------------------- appendNewRecord
 		this.appendNewRecord = function () {
 			// var newRecord = this.common_data.initial_record;
 			if ( this.common_data.code_field ) {
-				var d1 = new Date(2017, 1, 15, 11, 0, 0, 0);
-				var d2 = new Date();
-				this.common_data.initial_record[this.common_data.code_field] = d2.getTime() - d1.getTime();
+				var d1 = new Date(2017, 1, 15, 11, 0, 0, 0)
+				var d2 = new Date()
+				this.common_data.initial_record [ this.common_data.code_field ] = 
+									d2.getTime() - d1.getTime()
 			}
 			//if (Number.isInteger(this.common_data.initial_record.code)) {
-			//	var d1 = new Date(2017, 1, 15, 11, 0, 0, 0);
-			//	var d2 = new Date();
-			//	this.common_data.initial_record.code = d2.getTime() - d1.getTime();
+			//	var d1 = new Date(2017, 1, 15, 11, 0, 0, 0)
+			//	var d2 = new Date()
+			//	this.common_data.initial_record.code = d2.getTime() - d1.getTime()
 			//}
-			this.worker.postMessage( { request_type:4, params: { record:this.common_data.initial_record } } );
-		};
+			this.worker.postMessage( {
+				request_type:4,
+				params: { record: this.common_data.initial_record }
+			} )
+		}
 		// ============================================================================================= isReference
 		//  Проверка поля, является ли оно ссылкой на другую базу данных
 		this.isReference = function (fieldName) {
-			var fieldNum = this.getFieldIndex(fieldName);
-			var refs = this.common_data.fields.ref;
-			if ( !refs || !refs[fieldNum] ) { return false; }
-			return refs[fieldNum];
+			var fieldNum = this.getFieldIndex(fieldName)
+			var refs = this.common_data.fields.ref
+			if ( !refs || !refs[fieldNum] ) return false
+			return refs[fieldNum]
 		}
 		// ======================================================================================= testFieldReference
 		//  Проверка поля, является ли оно ссылкой на другую базу данных
@@ -285,67 +330,65 @@ function LNAU_DataBase (dataBaseId) {
 					sqlField: ref.sqlField
 				},
 				callback: function (responderId, _params) {
-					var requesterId = lnau.crossDatabaseProcessor.answerFrom[responderId].target;
+					var requesterId = lnau.crossDatabaseProcessor.answerFrom [ responderId ].target
 					
-					if (!requesterId) { return; }
-					var ref = lnau[requesterId].common_data;
-					var $data = lnau.crossDatabaseProcessor.getAnswer(responderId);
+					if ( !requesterId ) return
+					var ref = lnau [ requesterId ].common_data
+					var $data = lnau.crossDatabaseProcessor.getAnswer( responderId )
 					
-					if (!$data) { return false; }
-					lnau[requesterId].common_data[_params.requestedField] = {};
-					for (var recNum = 0; recNum < $data.length; recNum++) {
-						var _code = $data[recNum][_params.codeField];
-						var _data = $data[recNum][_params.dataField];
-						var _sql  = $data[recNum][_params.sqlField];
-						lnau[requesterId].common_data[_params.requestedField][_code] = { data:_data, sql:_sql };
+					if ( !$data ) return false
+					lnau [ requesterId ].common_data [ _params.requestedField ] = {}
+					for ( var recNum = 0; recNum < $data.length; recNum++ ) {
+						var _code = $data [ recNum ][ _params.codeField ]
+						var _data = $data [ recNum ][ _params.dataField ]
+						var _sql  = $data [ recNum ][ _params.sqlField ]
+						lnau [ requesterId ].common_data[ _params.requestedField ][ _code ] = 
+									{ data:_data, sql:_sql }
 					}
 					// 
-					var test = lnau[requesterId].common_data[_params.requestedField];
+					var test = lnau [ requesterId ].common_data[ _params.requestedField ]
 				}
-			};
+			}
 			
 			lnau.crossDatabaseProcessor.sendRequest (this.id, ref.baseId, params);
-		};
+		}
 		// ==================================================================================== showFieldsAsTable
 		this.showDataAsTable = function ($caption, $fields, $labels) {
 			var $table = document.createElement('table');
-			$table.appendChild(document.createElement('caption'));
-			$table.caption.innerHTML = $caption;
-			$table.caption.className = "green";
-			$table.cellspacing = '2';
-			$table.cellpadding = '4';
-			document.getElementById("main_content").innerHTML = '';
-			document.getElementById("main_content").appendChild($table);
-			var row = $table.insertRow(0);
+			$table.appendChild(document.createElement('caption'))
+			$table.caption.innerHTML = $caption
+			$table.caption.className = "green"
+			$table.cellspacing = '2'
+			$table.cellpadding = '4'
+			document.getElementById("main_content").innerHTML = ''
+			document.getElementById("main_content").appendChild($table)
+			var row = $table.insertRow(0)
 			for (var cellNum = 0; cellNum < $fields.length+1; cellNum++) {
-				var cell = row.insertCell(cellNum);
-				cell.className = "magenta";
-				cell.innerHTML = ( cellNum == 0 ) ? '' : $labels[cellNum-1];
+				var cell = row.insertCell(cellNum)
+				cell.className = "magenta"
+				cell.innerHTML = ( cellNum == 0 ) ? '' : $labels[cellNum-1]
 			}
 			for (var rowNum = 0; rowNum < this.data.length; rowNum++) {
 				
-				var row = $table.insertRow(rowNum+1);
+				var row = $table.insertRow(rowNum+1)
 				// ---------- checkbox -------------------
-				var cell = row.insertCell(0);
-				var $checkBox = document.createElement('input');
-				$checkBox.type = "checkbox";
-				$checkBox.name = "lnau_selRecord";
+				var cell = row.insertCell(0)
+				var $checkBox = document.createElement('input')
+				$checkBox.type = "checkbox"
+				$checkBox.name = "lnau_selRecord"
 				$checkBox.title = "Вибрати";
-				$checkBox.value = this.data[rowNum].record_num;
+				$checkBox.value = this.data[rowNum].record_num
 				cell.appendChild ($checkBox);
-				for (var cellNum = 0; cellNum < $fields.length; cellNum++) {
-					var cell = row.insertCell(cellNum+1);
-					cell.style.color = 'black';
-					cell.style.border = 'solid 1px gray';
-					var _value = this.getFieldValue (rowNum, $fields[cellNum]);
-					if (!_value) { cell.innerHTML = ''; }
+				for ( var cellNum = 0; cellNum < $fields.length; cellNum++ ) {
+					var cell = row.insertCell ( cellNum+1 )
+					cell.style.color = 'black'
+					cell.style.border = 'solid 1px gray'
+					var _value = this.getFieldValue ( rowNum, $fields [ cellNum ] )
+					if ( !_value ) cell.innerHTML = ''
 					else {
-						if ( typeof _value == 'string' || typeof _value == 'number' ) {
-							cell.innerHTML = _value; 
-						}
-						else {
-							cell.appendChild(_value);
-						}
+						if ( typeof _value == 'string' || typeof _value == 'number' )
+							cell.innerHTML = _value
+						else    cell.appendChild(_value)
 					}
 				}
 			}
@@ -353,64 +396,66 @@ function LNAU_DataBase (dataBaseId) {
 		// ------------------------------------------------------------------------------------------- showAllData
 		this.showAllData = function () {
 			if (!this.data || this.data.length === 0) {
-				document.getElementById("lnau_notice").innerHTML = "Дані відсутні";
-				return;
+				document.getElementById("lnau_notice").innerHTML = "Дані відсутні"
+				return
 			}
-			document.getElementById("lnau_notice").style.color = 'white';
-			document.getElementById("lnau_notice").innerHTML = '<h3>' + this.common_data.name + '</h3>';
+			document.getElementById("lnau_notice").style.color = 'white'
+			document.getElementById("lnau_notice").innerHTML = '<h3>' + this.common_data.name + '</h3>'
 			
 			//  Проверка, что выбрана табличная форма вывода
-			var tableForm = document.getElementsByName("lnau_tableForm").item(0).checked;
-			var caption = this.common_data.name;
+			var tableForm = document.getElementsByName("lnau_tableForm").item(0).checked
+			var caption = this.common_data.name
 			//  Test for query selection
 			if (this.common_data.selection && this.common_data.selection.keyValues) {
-				var fieldsList = this.common_data.selection.fieldsToShow; 
+				var fieldsList = this.common_data.selection.fieldsToShow
 				for (var j=0; j < this.common_data.selection.keyFields.length; j++) {
-					var _field = this.getFieldName(this.common_data.selection.keyFields[j]);
-					var _value = this.common_data.selection.keyValues[j];
+					var _field = this.getFieldName(this.common_data.selection.keyFields[j])
+					var _value = this.common_data.selection.keyValues[j]
 					
 					if(this.common_data[this.common_data.selection.keyFields[j]]) {
-						_value = this.common_data[this.common_data.selection.keyFields[j]][_value];
+						_value = this.common_data[this.common_data.selection.keyFields[j]][_value]
 					}
-					var html = (_value)?(_field + ': ' + _value + '&nbsp;&nbsp;'):("");
-					document.getElementById("lnau_notice").innerHTML += html;
+					var html = (_value)?(_field + ': ' + _value + '&nbsp;&nbsp;'):("")
+					document.getElementById("lnau_notice").innerHTML += html
 				}
 			}
 			else {
-				var fieldsList = (this.common_data.full_list)?(this.common_data.full_list.fieldsToShow):(this.common_data.fields.ids);
+				var fieldsList = this.common_data.full_list ?
+				    		this.common_data.full_list.fieldsToShow :
+						this.common_data.fields.ids
 			}
 			// --------------- table form ----------------
 			if (tableForm) {
 				
 				var $labels = [];
 				for (var j = 0; j < fieldsList.length; j++) {
-					$labels[j] = this.common_data.fields.names[this.getFieldIndex (fieldsList[j])];
+					$labels[j] = this.common_data.fields.names[this.getFieldIndex (fieldsList[j])]
 				}
-				this.showDataAsTable (caption, fieldsList, $labels);
-				return;
+				this.showDataAsTable (caption, fieldsList, $labels)
+				return
 			}
 			// --------------- sections form ----------------- 
 			for (var recNum = 0; recNum < this.data.length; recNum++) {
-				var section = document.createElement('section');
-				var $checkBox = document.createElement('input');
-				$checkBox.type = "checkbox";
-				$checkBox.name = "lnau_selRecord";
-				$checkBox.title = "Вибрати";
-				$checkBox.value = this.data[recNum].record_num;
+				var section = document.createElement('section')
+				var $checkBox = document.createElement('input')
+				$checkBox.type = "checkbox"
+				$checkBox.name = "lnau_selRecord"
+				$checkBox.title = "Вибрати"
+				$checkBox.value = this.data[recNum].record_num
 				
 				for (var fieldIndex = 0; fieldIndex < fieldsList.length; fieldIndex++) {
 					if ( this.isReference (fieldsList[fieldIndex]) ) {
-						elem = document.createElement('p');
-						elem.className = 'green';
-						elem.innerHTML = this.getReferenseFieldValue (recNum, fieldsList[fieldIndex]);
+						elem = document.createElement('p')
+						elem.className = 'green'
+						elem.innerHTML = this.getReferenseFieldValue (recNum, fieldsList[fieldIndex])
 					}
 					else {
-						elem = this.getInputField (0, recNum, fieldsList[fieldIndex]);
+						elem = this.getInputField (0, recNum, fieldsList[fieldIndex])
 					}
-					section.appendChild(elem);
+					section.appendChild(elem)
 				}
-				document.getElementById('main_content').appendChild(section);
-				section.appendChild($checkBox);
+				document.getElementById('main_content').appendChild(section)
+				section.appendChild($checkBox)
 			}
 		};
 		// ================================================================================ getReferenseFieldValue
