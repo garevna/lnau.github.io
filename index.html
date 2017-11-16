@@ -57,78 +57,78 @@
 	
 	
 	
-	function disciplinesList_callback ($response) {
+	function disciplinesList_callback ( $response ) {
 		//  справочник дисциплин
-		if (!lnau.disciplinesList.test_response( $response ) ) { return; }
+		if ( !lnau.disciplinesList.test_response( $response ) ) return
 		
 		if ($response.header.responseType == 0) {
-			lnau.header.indicators[5].innerHTML = '&#9632;';
-			lnau.header.indicators[5].style.color = 'green';
+			lnau.header.indicators[5].innerHTML = '&#9632;'
+			lnau.header.indicators[5].style.color = 'green'
 			// Создаем базу учебной нагрузки только после загрузки справочника дисциплин
 			lnau.disciplines  = new LNAU_DataBase ('disciplines');
 			lnau.disciplines.sourceURL = [];
 			lnau.disciplines.phpURL = [];
 			for (var i=0; i<7; i++) {
-				lnau.disciplines.sourceURL[i] = '/lnau/json/disciplines_0' + (i+1) + '.json';
-				lnau.disciplines.phpURL[i] = '/lnau/php/save_disciplines_0' + (i+1) + '.php';;
+				lnau.disciplines.sourceURL[i] = 'json/disciplines_0' + (i+1) + '.json'
+				lnau.disciplines.phpURL[i] = 'php/save_disciplines_0' + (i+1) + '.php'
 			}
-			lnau.disciplines.createWorkerInstance(lnau.disciplines.callback);
-			lnau.summary   = new LNAU_DataBase ('summary');
-			lnau.summary.createWorkerInstance(lnau.summary.callback);
+			lnau.disciplines.createWorkerInstance(lnau.disciplines.callback)
+			lnau.summary   = new LNAU_DataBase ('summary')
+			lnau.summary.createWorkerInstance(lnau.summary.callback)
 		}
 	}
-	function groups_callback ($response) {
+	function groups_callback ( $response ) {
 		//  info по группам
-		if (!lnau.groups.test_response( $response ) ) { return; }
+		if ( !lnau.groups.test_response( $response ) ) return
 		if ($response.header.responseType == 0) {
-			lnau.header.indicators[2].innerHTML = '&#9632;';
-			lnau.header.indicators[2].style.color = 'green';
+			lnau.header.indicators[2].innerHTML = '&#9632;'
+			lnau.header.indicators[2].style.color = 'green'
 		}
 	}
 	// ----------------------------------------------------------------------------------- info по преподавателям
-	function teachers_callback ($response) {
-		if (!lnau.teachers.test_response( $response )) { return; }
-		if ($response.header.responseType == 0) {
-			lnau.header.indicators[6].innerHTML = '&#9632;';
-			lnau.header.indicators[6].style.color = 'green';
+	function teachers_callback ( $response ) {
+		if ( !lnau.teachers.test_response( $response ) ) return
+		if ( $response.header.responseType == 0 ) {
+			lnau.header.indicators[6].innerHTML = '&#9632;'
+			lnau.header.indicators[6].style.color = 'green'
 		}
 	}
 	// ----------------------------------------------------------------------------------- info по специальностям
-	function specialities_callback ($response) {
-		if (!lnau.specialities.test_response( $response )) { return; }
+	function specialities_callback ( $response ) {
+		if (!lnau.specialities.test_response( $response )) return
 		if ($response.header.responseType == 0) {
-			lnau.header.indicators[1].innerHTML = '&#9632;';
-			lnau.header.indicators[1].style.color = 'green';
+			lnau.header.indicators[1].innerHTML = '&#9632;'
+			lnau.header.indicators[1].style.color = 'green'
 		}
 	}
 	// ----------------------------------------------------------------------------------- info по направлениям
-	function directions_callback ($response) {
-		if (!lnau.directions.test_response( $response )) { return; }
-		if ($response.header.responseType == 0) {
-			lnau.header.indicators[0].innerHTML = '&#9632;';
-			lnau.header.indicators[0].style.color = 'green';
+	function directions_callback ( $response ) {
+		if ( !lnau.directions.test_response( $response ) ) return
+		if ( $response.header.responseType == 0 ) {
+			lnau.header.indicators[0].innerHTML = '&#9632;'
+			lnau.header.indicators[0].style.color = 'green'
 		}
 	}
 	// ----------------------------------------------------------------------------------- info по дисциплинам
-	function disciplines_callback ($response) {
-		if (!lnau.disciplines.test_response( $response )) { return; }
+	function disciplines_callback ( $response ) {
+		if (!lnau.disciplines.test_response( $response )) return
 		if ($response.header.responseType == 0) {
-			lnau.header.indicators[3].innerHTML = '&#9632;';
-			lnau.header.indicators[3].style.color = 'green';
+			lnau.header.indicators[3].innerHTML = '&#9632;'
+			lnau.header.indicators[3].style.color = 'green'
 		}
 	}
 	function auditories_callback ($response) {
-		if (!lnau.auditories.test_response( $response )) { return; }
+		if (!lnau.auditories.test_response( $response )) return
 		if ($response.header.responseType == 0) {
-			lnau.header.indicators[4].innerHTML = '&#9632;';
-			lnau.header.indicators[4].style.color = 'green';
+			lnau.header.indicators[4].innerHTML = '&#9632;'
+			lnau.header.indicators[4].style.color = 'green'
 		}
 	}
 	function summary_callback ($response) {
-		if (!lnau.summary.test_response( $response )) { return; }
+		if (!lnau.summary.test_response( $response )) return
 		if ($response.header.responseType == 0) {
-			lnau.header.indicators[7].innerHTML = '&#9632;';
-			lnau.header.indicators[7].style.color = 'green';
+			lnau.header.indicators[7].innerHTML = '&#9632;'
+			lnau.header.indicators[7].style.color = 'green'
 		}
 	}
 	// ----------------------------------------------------------------------------------- 
