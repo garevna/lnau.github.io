@@ -1,8 +1,8 @@
 //                                 C O N S T R U C T O R
 // -----------------------------------------------------------------------------------------------------
 function LNAU_DataBase (dataBaseId) {
-		this.sourceURL = '/lnau/json/' + dataBaseId + '.json';
-		this.phpURL = '/lnau/php/save_' + dataBaseId + '.php';
+		this.sourceURL = 'json/' + dataBaseId + '.json';
+		this.phpURL = 'php/save_' + dataBaseId + '.php';
 		this.common_data = {};
 		this.data = {};
 		this.tmp = {};
