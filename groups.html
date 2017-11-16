@@ -1,0 +1,355 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>ЛНАУ</title>
+<style>
+    #lnau_header {
+        position:fixed;
+        box-sizing:border-box;
+        z-index:105;
+        top:0;
+        left:0;
+        height:9%;
+        min-height:50px;
+        width:100%;
+        padding: 2px 15px;
+        border-bottom:solid 1px gray;
+        box-shadow: 5px 5px 5px rgba(0,0,0,0.3);*/
+        background-color:#ccc;
+	}
+	#lnau_Container {
+		top:10%;
+		bottom:10%;
+		left:10%;
+		right:10%;
+		color:white;
+		display:none;
+	}
+	.lnau_popupWindow {
+		position:fixed;
+		padding:3%;
+		border:inset 1px;
+		border-radius:2%;
+		z-index:1000;
+	}
+	.lnau_popupWinContent {
+		padding-right:10px;
+		overflow:auto;
+		height:95%;
+	}
+	.lnau_roundedButton {
+		box-sizing:border-box;
+		border-radius: 50%;
+		text-align:center;
+		font-size:14px;
+		font-weight:bold;
+		font-family:'Helvetica';
+		text-shadow:1px 1px 1px rgba(0,0,0,0.7);
+		color:white;
+		border:solid 1px white;
+		width:20px;
+		height:20px;
+		margin-right:5px;
+	}
+	.lnau_roundedButton:hover {
+		cursor:pointer;
+	}
+	.lnau_showButton {
+		background-image: url(https://drive.google.com/uc?export=download&id=0BxaMB69y7fvSM1pxRDBEaGRqcU0);
+		background-repeat: no-repeat;
+		background-size: contain;
+		position: fixed;
+		top: 2px;
+		right: 2px;
+		width: 40px;
+		height: 40px;
+		background-color:transparent;
+		border:none;
+	}
+    .shadow_box {
+		-webkit-box-shadow:2px 2px 2px rgba(0,0,0,0.7);
+		box-shadow:2px 2px 2px rgba(0,0,0,0.7);
+		float:left;
+		margin:5px;
+		padding:5px;
+	}
+	.discipline {
+		width:90%;
+	}
+	.disciplines {
+		position:absolute;
+		top:20%;
+		border:inset 1px;
+		width:95%;
+		height:80%;
+		overflow:auto;
+	}
+</style>
+<script>
+    var lnau = {};
+	
+	lnau.data = new Date();
+	lnau.data = { day:lnau.data.getDate(), month:lnau.data.getMonth()+1, year: lnau.data.getFullYear() };
+	lnau.selected_course = 1;
+	lnau.semestr = (lnau.data.month > 5)?1:2;
+	lnau.selected_course = 1;
+	lnau.selected_speciality = '201';
+	lnau.$buttonsTypes = [{
+        type: 'close',
+        symb: 'x',
+        backColor: 'red',
+        top: '0',
+        right: '0',
+        func: function(event) {
+            event.target.parentNode.style.display = 'none';
+        }
+	},
+	{
+        type: 'help',
+        symb: '?',
+        backColor: 'blue',
+        float:'left',
+        func: function(event) {
+            lnau.taskHelp(event.target.num);
+        }
+    }];
+	lnau.createButton = function(type, num) {
+		var btn = document.createElement('div');
+		btn.className = "lnau_roundedButton";
+		btn.innerHTML = lnau.$buttonsTypes[type].symb;
+		btn.style.backgroundColor = lnau.$buttonsTypes[type].backColor;
+		if (lnau.$buttonsTypes[type].float) {
+			btn.style.float = lnau.$buttonsTypes[type].float;
+		}
+		if (lnau.$buttonsTypes[type].type == 'close') {
+			btn.style.position = 'absolute';
+			btn.style.top = lnau.$buttonsTypes[type].top;
+			btn.style.right = lnau.$buttonsTypes[type].right;
+		}
+		else {
+			btn.num = num;
+		}
+		btn.onclick = function(event) {
+			var func = lnau.$buttonsTypes[type].func;
+			func(event); //  type should be 0 (close button) or 1 (help button)
+		};
+		return btn;
+	};
+	lnau.constructPopupWindow = function(obj) {
+		obj.className = 'lnau_popupWindow';
+		obj.style.top = obj._top || '12%';
+		obj.style.left = obj._left || '10%';
+		obj.style.height = obj._height || '70%';
+		obj.style.width = obj._width || '75%';
+		obj.style.backgroundColor = obj.backColor || "#333";
+		obj.content = document.createElement('div');
+		obj.appendChild(obj.content);
+		obj.content.className = 'lnau_popupWinContent';
+		obj.closeBtn = lnau.createButton(0);
+		obj.appendChild(obj.closeBtn);
+	};
+	lnau.taskHelp = function(num) {
+		var $hlp = document.getElementById("lnau_helpWin");
+		if (!$hlp) {
+			$hlp = document.createElement('div');
+			document.body.appendChild($hlp);
+			$hlp._width = '58%';
+			$hlp._top = '25%';
+			$hlp._left = '20%';
+			$hlp._height = '50%';
+			$hlp.backColor = 'black';
+			lnau.constructPopupWindow($hlp);
+			$hlp.id = "lnau_helpWin";
+		}
+		$hlp.content.innerHTML = "<p>" + lnau.html[num].hlp + "</p>";
+		$hlp.style.display = "block";
+	};
+	// ================================================================================================ loadSourceDate
+    function loadSourceDate (worker, sourceURL, callback, params) {
+			try {
+				worker = new Worker('/js/json_loader.js');
+				worker.postMessage(sourceURL);
+				worker.addEventListener('message', function(e) {
+					var $data = e.data;
+					worker.terminate();
+					worker = undefined;
+					if (e.data) {
+						callback($data, params);
+					}
+					else {
+						alert("Ограниченная функциональность. Отсутствуют необходимые библиотеки: " + sourceURL);
+					}
+				}, false);
+			}
+			catch (err) {
+				alert("Пожалуйста, обновите браузер. К сожалению, в Вашем браузере полная функциональность невозможна");
+			}
+    }
+	// ======================================================================================================== callbacks
+	function groupsInfo_callback (_data) { //                                              info по группам
+		lnau.groups = _data;
+	}
+	// ----------------------------------------------------------------------------------- info по специальностям
+	function specInfo_callback (_data) {
+		lnau.specialities = _data;
+		lnau.start();
+	}
+	// ----------------------------------------------------------------------------------- info по направлениям
+	function directInfo_callback (_data) {
+		lnau.directions = _data;
+	}
+	function disciplinInfo_callback (_data) {
+		lnau.disciplines = _data;
+	}
+	// =================================================================================== Дисциплины по всем ключам
+	function get_disciplines_by_all_keys (elem) {
+		return elem.course == lnau.selected_course && elem.semestr == lnau.semestr && (elem.speciality_1 == lnau.selected_speciality || elem.speciality_2 == lnau.selected_speciality || elem.speciality_1 == ('6.' + lnau.selected_speciality) || elem.speciality_2 == ('6.' + lnau.selected_speciality) || elem.speciality_1 == ('7.' + lnau.selected_speciality) || elem.speciality_2 == ('7.' + lnau.selected_speciality) || elem.speciality_1 == ('8.' + lnau.selected_speciality) || elem.speciality_2 == ('8.' + lnau.selected_speciality));
+	}
+	function getDisciplines () {
+		return lnau.disciplines.filter(get_disciplines_by_all_keys);
+	}
+	// ============================================================================================== Все дисциплины
+	
+	function get_all_disciplenes_list () {
+		var x = document.getElementById("lnau_container");
+		
+		var z;
+		var s;
+		var elem;
+		for (var j=0; j<lnau.disciplines.length; j++) {
+			elem = lnau.disciplines[j];
+			z = document.createElement('p');
+			z.className = "shadow_box";
+			x.appendChild(z);
+			s = document.createElement('span');
+			s.innerHTML = "Scpeciality: " + elem.speciality_1 + ' | ';
+			z.appendChild(s);
+			s = document.createElement('span');
+			s.innerHTML = (elem.speciality_2)?(elem.speciality_2 + ' | '):"";
+			z.appendChild(s);
+			s = document.createElement('span');
+			s.innerHTML = "Course: " + elem.course;
+			z.appendChild(s);
+		}
+	}
+	function show_disciplines () {
+		var $list = getDisciplines ();
+		console.log($list);
+		var x = document.getElementById("lnau_diciplines");
+		x.innerHTML = '';
+		var z;
+		for (var j=0; j<$list.length; j++) {
+			z = document.createElement('input');
+			z.type = 'text';
+			z.defaultValue = $list[j].discipline;
+			z.className = "discipline";
+			x.appendChild(z);
+		}
+	}
+	
+	// ===================================================================================================== START
+	lnau.start = function () {
+		
+		var $header = document.createElement('div');
+		document.body.appendChild($header);
+		$header.id = "lnau_header";
+		var spec = document.createElement('div');
+		spec.className = 'shadow_box';
+		spec.innerHTML = 'Специальность: ';
+		$header.appendChild(spec);
+		var sel = document.createElement('select');
+		sel.id = "lnau_select_speciality";
+		sel.value = lnau.selected_speciality_name;
+		spec.appendChild(sel);
+		var $option;
+		for (var j=0; j<lnau.specialities.length; j++) {
+			$option = document.createElement('option');
+			$option.value = lnau.specialities[j].name;
+			$option.innerHTML = lnau.specialities[j].code;
+			sel.appendChild($option);
+		}
+		sel.onchange = function (event) {
+			lnau.selected_speciality_code = event.target.innerHTML;
+			lnau.selected_speciality_name = event.target.value;
+		}
+		var $course = document.createElement('select');
+		$header.appendChild($course);
+		$course.style.position = 'absolute';
+		$course.style.right = '50px';
+		$course.style.top = '7px';
+		$course.style.fontSize = '10px';
+		for (var j=0; j<7; j++) {
+			$option = document.createElement('option');
+			$option.value = j+1;
+			$option.innerHTML = j+1;
+			$course.appendChild($option);
+		}
+		$course.value = lnau.selected_course;
+		$course.onchange = function (event) {
+			lnau.selected_course = event.target.value;
+		}
+        
+        var $container = document.getElementById("lnau_container");
+        //$container.innerHTML = '';
+        lnau.constructPopupWindow($container);
+		var $btn = document.createElement('input');
+		$btn.type = "button";
+		$btn.className = "lnau_showButton";
+		$btn.title = "Показать перечень дисциплин";
+		document.getElementById("lnau_header").appendChild($btn);
+		$btn.onclick = function(event) {
+			show_disciplines ();
+		}
+    }
+</script>
+</head>
+
+<body>
+    
+    <form action="disciplines_append.php" method="post" id="lnau_container">
+        <div id = "lnau_diciplines">
+            Курс: <input type="text" name="course" value="1" style="width:auto" />
+            Семестр: <input type="text" name="semestr" value="1" style="width:auto" /><br/>
+            Специальность: 1. <input type="text" name="speciality_1" value="" />
+                           2. <input type="text" name="speciality_2" value="" /><br/>
+            Дисциплина: <input type="text" name="discipline" value="" /><br/>
+            Кафедра, ведущая дисциплину: <input type="text" name="kafedra" value="" /><br/>
+            <div class="shadow_box">Часы: 
+                 Норматив: <input type="text" name="norm" value="" />
+                 Фактически: <input type="text" name="fact" value="" />
+                 <div class="shadow_box">Семестр:
+                     Предыдущий: <input type="text" name="previous" value="" />
+                     Текущий: <input type="text" name="current" value="" />
+                     Следующий: <input type="text" name="next" value="" />
+                 </div>
+                 <div class="shadow_box">Аудиторных: <input type="text" name="auditorial" value="" />
+                     Лекций: <input type="text" name="lectures" value="" />
+                     Лабораторных: <input type="text" name="laboratory" value="" />
+                     Практических: <input type="text" name="practice" value="" />
+                     Самостоятельной работы: <input type="text" name="self_work" value="" />
+                     Курсовые: <input type="text" name="corse_work" value="" />
+                 </div>
+            </div>
+            <div class="shadow_box">Контроль:
+                РГР: <input type="text" name="rgr" value="" />
+                Экзамен: <input type="text" name="exam" value="" />
+                Зачет: <input type="text" name="credit" value="" />
+                Контрольные работы: <input type="text" name="control_work" value="" />
+            </div>
+        </div>
+        <input type="submit" value="Добавить">
+    </form>
+    
+    <script>
+	    var lnau_groupsWorker;
+		var lnau_specWorker;
+		var lnau_directWorker;
+		var lnau_disciplinWorker;
+		loadSourceDate (lnau_groupsWorker, '/data_files/lnau/groups.json', groupsInfo_callback);
+		loadSourceDate (lnau_specWorker, '/data_files/lnau/specialities.json', specInfo_callback);
+		loadSourceDate (lnau_directWorker, '/data_files/lnau/directions.json', directInfo_callback);
+		loadSourceDate (lnau_disciplinWorker, '/data_files/lnau/disciplines.json', disciplinInfo_callback);
+    </script>
+</body>
+</html>

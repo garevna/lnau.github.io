@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>change disciplines JSON</title>
+<script src="/lnau/js/lnau_lib.js"></script>
+<script>
+    var _json = [];
+	var _worker = {};
+	function convert_data ($data) {
+		if (!$data) {
+			alert('Нет данных для конвертации');
+			return;
+		}
+		document.getElementById("_JSON_").innerHTML = '';
+		for (var j=0; j<$data.length; j++) {
+			$data[j] = convert_record($data[j]);
+		}
+		document.getElementById("_JSON_").innerHTML = JSON.stringify($data);
+		lnau_lib.updateAllRecods(_worker, $data);
+		console.info('request to worker has been sent...');
+	}
+	function convert_record (_record) {
+		var record = {};
+		record.course = _record.course;
+		record.semestr = _record.semestr;
+		record.speciality = [_record.speciality_1, _record.speciality_2];
+		record.discipline = _record.discipline;
+		record.kafedra = _record.kafedra;
+		record.hours = {
+				norm: _record.hours,
+				fact: _record.hours_fact,
+				previous: _record.hours_prev,
+				current: _record.hours_now,
+				next: _record.hours_next,
+				auditorial: _record.hours_auditorial,
+				lectures: _record.lectures,
+				laboratory: _record.laboratory,
+				practice: _record.practice,
+				self_work: _record.self_work
+		};
+		record.control = {
+				course_work:(_record.corse_work&&_record.corse_work.length==0)?null:_record.corse_work,
+				rgr:(_record.rgr&&(_record.rgr.length==0))?null:_record.rgr,
+				exam:(_record.exam&&(_record.exam.length==0))?null:_record.exam,
+				credit:(_record.credit&&(_record.credit.length==0))?null:_record.credit,
+				control_work:(_record.control_work&&(_record.control_work.length==0))?null:_record.control_work
+		};
+		return record;
+	}
+	// ================================================================================================= worker_callback
+	function worker_callback (_data) {
+		
+		switch (_data.header.requestType) {
+			case  0:
+			    if (_data.status) { lnau_lib.callWorker (_worker); }
+				else { alert('Не удалось создать работника'); }
+				break;
+			case  1:
+			    if (_data.status) {
+					_json = _data.result;
+					document.getElementById("_JSON_").innerHTML = JSON.stringify(_json);
+				}
+				else { alert('Не удалось получить данные'); }
+				break;
+			case  3:
+			    if (_data.status) {
+					_json = _data.result;
+				}
+				else { alert('Не удалось получить данные'); }
+				break;
+			case 10:
+			    if (_data.status) { alert('Данные сохранены'); }
+				else { alert('Не удалось сохранить данные'); }
+				break;
+			default:
+			    alert('header.requestType: ' + _data.header.requestType);
+				alert('status: ' + _data.status);
+				break;
+		}
+	}
+</script>
+</head>
+
+<body>
+    <div id = "_JSON_" style="width:98%; height:300px; overflow:auto; border:inset 1px; padding:10px;"></div>
+    <input type="button" value="Convert" onClick="convert_data (_json);">
+    <input type="button" value="Save" onClick="lnau_lib.saveJSON(_worker);">
+    <script>
+	    _worker = lnau_lib.createWorkerInstance (_worker, '/lnau/json/disciplines.json', '/lnau/php/save_disciplines.php', 'worker_callback');
+	</script>
+</body>
+</html>
