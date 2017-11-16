@@ -189,7 +189,7 @@ this.addEventListener('message', function(e) {
 			if (responseHeader.fields) {
 				responseHeader.responseType += 1
 				responseHeader.fields = Array.isArray( responseHeader.fields ) ?
-							responseHeader.fields) : [responseHeader.fields]
+							responseHeader.fields : [responseHeader.fields]
 				$response = Array.isArray( $response ) ? $response : [$response]
 				
 				var tmp = []
