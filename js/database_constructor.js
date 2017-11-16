@@ -101,7 +101,7 @@ function LNAU_DataBase (dataBaseId) {
 		// -------------------------------------------------------------------------------- createWorkerInstance
 		this.createWorkerInstance = function (callback) {
 			try {
-				this.worker = new Worker('/lnau/js/json_loader_multydata.js');
+				this.worker = new Worker('js/json_loader_multydata.js');
 				this.worker.id = dataBaseId;
 				this.worker.addEventListener('message', function(e) {
 					if (!e.data.status) {
