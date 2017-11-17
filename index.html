@@ -63,8 +63,8 @@
 			lnau.disciplines.sourceURL = [];
 			lnau.disciplines.phpURL = [];
 			for (var i=0; i<7; i++) {
-				lnau.disciplines.sourceURL[i] = '/lnau/json/disciplines_0' + (i+1) + '.json';
-				lnau.disciplines.phpURL[i] = '/lnau/php/save_disciplines_0' + (i+1) + '.php';;
+				lnau.disciplines.sourceURL[i] = 'json/disciplines_0' + (i+1) + '.json';
+				lnau.disciplines.phpURL[i] = 'php/save_disciplines_0' + (i+1) + '.php';;
 			}
 			lnau.disciplines.createWorkerInstance(lnau.disciplines.callback);
 			lnau.summary   = new LNAU_DataBase ('summary');
