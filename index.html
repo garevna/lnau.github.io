@@ -5,10 +5,10 @@
 <title>ЛНАУ</title>
 <link rel="stylesheet" href="css/styles_new.css">
 <link rel="stylesheet" href="lnau_styles.css">
-<script src="js/lnau.js"></script>
-<script src="js/lnau_lib.js"></script>
-<script src="js/database_constructor.js"></script>
-<script src="js/funcs.js"></script>
+<script src="https://garevna.github.io/lnau.github.io/js/lnau.js"></script>
+<script src="https://garevna.github.io/lnau.github.io/js/lnau_lib.js"></script>
+<script src="https://garevna.github.io/lnau.github.io/js/database_constructor.js"></script>
+<script src="https://garevna.github.io/lnau.github.io/js/funcs.js"></script>
 
 <style>
     td {
@@ -63,8 +63,8 @@
 			lnau.disciplines.sourceURL = [];
 			lnau.disciplines.phpURL = [];
 			for (var i=0; i<7; i++) {
-				lnau.disciplines.sourceURL[i] = 'json/disciplines_0' + (i+1) + '.json';
-				lnau.disciplines.phpURL[i] = 'php/save_disciplines_0' + (i+1) + '.php';;
+				lnau.disciplines.sourceURL[i] = 'https://garevna.github.io/lnau.github.io/json/disciplines_0' + (i+1) + '.json';
+				lnau.disciplines.phpURL[i] = 'https://garevna.github.io/lnau.github.io/php/save_disciplines_0' + (i+1) + '.php';;
 			}
 			lnau.disciplines.createWorkerInstance(lnau.disciplines.callback);
 			lnau.summary   = new LNAU_DataBase ('summary');
